@@ -37,7 +37,7 @@ const generateCatCard = (cats) => {
 
 // Показать всех котов
 function showCat() {
-    fetch(`https://cats.petiteweb.dev/api/single/sergeevseo/show`)
+    api.getAllCats()
         .then(res => {
             return res.json()
         })
@@ -46,42 +46,31 @@ function showCat() {
             $container.insertAdjacentHTML("beforeend", generateCatCard(elem))
             });
         })
+        .catch (() =>{
+            console.log("Что-то пошло не так")}
+        )
 }
 
 // Кнопки на карточке
 $container.addEventListener("click", async(event) => {
-    //Переключатель любимый/нелюбимый
+    // Переключатель любимый/нелюбимый
     if (event.target.classList.contains("fa-heart")){
         const id = event.target.closest("[data-card]").dataset.card;
         if(event.target.classList.contains("fa-regular")){
-            await fetch(`https://cats.petiteweb.dev/api/single/sergeevseo/update/${id}`, {
-                method: "PUT",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body: JSON.stringify({"favorite": true})
-                 })
-                document.location.reload();
+            await api.editFavorite(id, true)
+            document.location.reload();
         } else if (event.target.classList.contains("fa-solid")){
-                await fetch(`https://cats.petiteweb.dev/api/single/sergeevseo/update/${id}`, {
-                    method: "PUT",
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
-                    body: JSON.stringify({"favorite": false}) 
-            })
+            await api.editFavorite(id, false)
             document.location.reload();
         }
     }
-    //Удаление
+    // Удаление
     if (event.target.classList.contains("fa-xmark")||event.target.classList.contains("cat-card__btn_delete")){
         const id = event.target.closest("[data-card]").dataset.card;
-        await fetch(`https://cats.petiteweb.dev/api/single/sergeevseo/delete/${id}`,{
-            method: "DELETE"
-        });
+        await api.deleteCat(id);
         document.location.reload();
     }
-    //Подробная информация о коте
+    // Подробная информация о коте
     if (event.target.classList.contains("fa-file-lines")||event.target.classList.contains("cat-card__btn_open")){
         $modalCatInfo.classList.remove("hidden");
         const id = event.target.closest("[data-card]").dataset.card;
@@ -91,7 +80,7 @@ $container.addEventListener("click", async(event) => {
 
 // Отрисовка кота
 const showCurrentCat = (id) =>{
-    fetch(`https://cats.petiteweb.dev/api/single/sergeevseo/show/${id}`)
+    api.getCurrentCat(id)
     .then(res => {
         return res.json();
     })
@@ -137,7 +126,7 @@ function showRate(rate){
         } else {
             $star.classList.add("fa-regular", "fa-star");
             $ratingFront.appendChild($star);
-        }  
+        }
     }
 }
 
@@ -145,21 +134,22 @@ function showRate(rate){
 function showFavorUnfavor(favorite) {
     const $favorite = $modalCatInfo.querySelector(".modal-cat-card__favorite");
     const $heart = document.createElement("i");
+    $heart.classList.add("fa-sharp", "fa-heart");
     while($favorite.firstChild){
         $favorite.firstChild.remove();
     }
     if (favorite) {
-        $heart.classList.add("fa-sharp", "fa-solid", "fa-heart")
+        $heart.classList.add("fa-solid")
         $favorite.appendChild($heart);
     } else {
-        $heart.classList.add("fa-sharp", "fa-regular", "fa-heart")
+        $heart.classList.add("fa-regular")
         $favorite.appendChild($heart);
     }
 }
 
-//Закрыть подробную информацию о коте
+// Закрыть подробную информацию о коте
 $modalCatInfo.addEventListener("click", (event) =>{
-    if (event.target.classList.contains("fa-rectangle-xmark")||event.target.hasAttribute("data-modal_cat-info")){
+    if (event.target.classList.contains("fa-rectangle-xmark")){
         $modalCatInfo.classList.add("hidden")
     }
 })
@@ -170,7 +160,7 @@ $addBtn.addEventListener("click", (event) => {
 })
 
 $modalAddCat.addEventListener("click", (event) => {
-    if(event.target.classList.contains("fa-rectangle-xmark")||event.target.hasAttribute("data-modal_wrapper")){
+    if(event.target.classList.contains("fa-rectangle-xmark")){
         $modalAddCat.classList.add("hidden")
     }
 })
@@ -182,17 +172,9 @@ document.forms['add-cat'].addEventListener("submit", async (event) => {
     data.age = Number(data.age);
     data.rate = Number(data.rate);
     data.favorite = !!data.favorite;
-    await fetch("https://cats.petiteweb.dev/api/single/sergeevseo/add",{
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
+    await api.addNewCat(data);
     $modalAddCat.classList.add("hidden")
     document.location.reload();
 })
-
-
 
 showCat();
