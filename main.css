@@ -2,6 +2,15 @@ body {
     margin: 0;
     padding: 0;
     background: #f0f0f0;
+    position: relative;
+}
+
+input, textarea {
+    display: block;
+}
+
+.hidden {
+    display: none !important;
 }
 
 div {
@@ -21,6 +30,45 @@ button {
   cursor: pointer;
 }
 
+h1, h2 {
+    margin-top: 0;
+}
+
+.header {
+    background: #ffffff;
+    box-shadow: 0 0 25px rgb(0 0 0 / 25%);
+}
+
+.head {
+    width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 40px;
+}
+
+.btn {
+    border: 3px solid #bebebe;
+    border-radius: 10px;
+    padding: 7px;
+    background: #d5ffd8;
+    font-size: 18px; 
+}
+.btn:hover, .cat-card__btn:hover {
+    border-color: #5a5a5a;
+}
+
+.btn:active, .cat-card__btn:active {
+    box-shadow: 0 0 5px rgb(0 0 0);
+    border-color: #5a5a5a;
+}
+
 .container {
     width: 1140px;
     margin: 0 auto;
@@ -28,6 +76,7 @@ button {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-row-gap: 30px;
+    grid-column-gap: 25px;
 }
 
 .cat-card {
@@ -74,10 +123,12 @@ button {
     border-radius: 50%;
     font-size: 22px;
     border: 3px solid #bebebe;
-    line-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.cat-card__btn_edit {
+.cat-card__btn_open {
     color: #f5d36d;
 }
 
@@ -90,10 +141,106 @@ button {
  color: #4bcb90;
 }
 
-.cat-card__id {
+.modal-wrapper, .modal-cat-info {
     position: absolute;
-    bottom: 3px;
-    right: 5px;
-    font-size: 12px;
-    color: #acacac;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: rgb(0 0 0 / 80%);
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* Модальное окно добавления кота */
+.modal-add-cat {
+    background: #f0f0f0;
+    position: fixed;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 5vw;
+}
+
+.modal-add-cat input, textarea {
+    margin-top: 2px;
+    padding: 5px;
+}
+
+.modal-close {
+    font-size: 16px;
+    color: #f4676a;
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}
+
+.modal-add-cat__numbers {
+    display: flex;
+}
+
+.modal-add-cat__numbers p:first-child {
+    margin-right: 30px;
+}
+
+.modal-add-cat__checkbox {
+    display: inline;
+    font-size: 20px;
+}
+
+.modal-add-cat button {
+    display: block;
+    margin-left: auto;
+}
+
+/* Модальное окно кота */
+.modal-cat-card {
+    position: fixed;
+    background: #f0f0f0;
+    border-radius: 0 15px 15px 0;
+    display: flex;
+    margin-top: 15vw;
+}
+
+.modal-cat-card__img {
+    height: 400px;
+    width: 400px;
+    object-fit: cover;
+}
+
+.modal-cat-card__param {
+    padding: 15px;
+    margin: auto 0;
+}
+
+.modal-cat-card__description {
+    font-weight: bold;
+    font-size: 18px;
+    margin: 7px 0;
+}
+
+.modal-cat-card__text {
+    width: 250px;
+    padding-left: 10px;
+}
+
+.modal-cat-card__age {
+ font-size: 18px;
+ margin-bottom: 10px;
+}
+
+.modal-cat-card__infographic {
+    display: flex;
+    align-items: center;
+}
+
+.modal-cat-card__rating {
+    color: #ffbc00;
+    font-size: 20px;
+    margin-right: 20px;
+}
+
+.modal-cat-card__favorite {
+    color: #4bcb90;
+    font-size: 30px;
 }
