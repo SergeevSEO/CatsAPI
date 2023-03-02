@@ -225,12 +225,13 @@ document.forms.addCat.addEventListener("input", event => {
 const dataFromLS = localStorage.getItem("addCat");
 const parsedDataFromLS = dataFromLS ? JSON.parse(dataFromLS) : null;
 
-
 if (parsedDataFromLS) {
     for (key in parsedDataFromLS) {
         document.forms.addCat[key].value = parsedDataFromLS[key];
     }
 }
 
-
 showCat();
+
+
+// Пытаюсь что-то сделать с Git
