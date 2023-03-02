@@ -1,6 +1,7 @@
 const $container = document.querySelector("[data-container]");
 const $addBtn = document.querySelector("[data-btn_add]");
 const $modalAddCat = document.querySelector("[data-modal_wrapper]");
+const $modalEditCat = document.querySelector("[data-modal_wrapper_edit]");
 const $modalCatInfo = document.querySelector("[data-modal_cat-info]");
 
 
@@ -21,13 +22,13 @@ const generateCatCard = (cats) => {
             </p>
         </div>
         <div class="cat-card__btns">
-            <button data-btn_open class="cat-card__btn cat-card__btn_open">
+            <button data-btn_action = "open" class="cat-card__btn cat-card__btn_open">
             <i class="fa-regular fa-file-lines"></i>
             </button>
-            <button data-btn_delete class="cat-card__btn cat-card__btn_delete">
+            <button data-btn_action = "delete" class="cat-card__btn cat-card__btn_delete">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <button data-btn_favorite class="cat-card__btn cat-card__btn_favorite">
+            <button data-btn_action = "favorite" class="cat-card__btn cat-card__btn_favorite">
                 ${favorite}
             </button>
         </div>
@@ -54,24 +55,28 @@ function showCat() {
 // Кнопки на карточке
 $container.addEventListener("click", async(event) => {
     // Переключатель любимый/нелюбимый
-    if (event.target.classList.contains("fa-heart")){
+    if (event.target.dataset.btn_action === "favorite"){
         const id = event.target.closest("[data-card]").dataset.card;
-        if(event.target.classList.contains("fa-regular")){
-            await api.editFavorite(id, true)
-            document.location.reload();
-        } else if (event.target.classList.contains("fa-solid")){
+        $btnFavorite = event.target;
+        const data = await api.getCurrentCat (id);
+        const cat = await data.json(); 
+        if(cat.favorite){
             await api.editFavorite(id, false)
-            document.location.reload();
+            $btnFavorite.innerHTML = `<i class="fa-sharp fa-regular fa-heart"></i>`;
+        } else {
+            await api.editFavorite(id, true)
+            $btnFavorite.innerHTML = `<i class="fa-sharp fa-solid fa-heart"></i>`;
         }
     }
     // Удаление
-    if (event.target.classList.contains("fa-xmark")||event.target.classList.contains("cat-card__btn_delete")){
+    if (event.target.dataset.btn_action === "delete"){
         const id = event.target.closest("[data-card]").dataset.card;
         await api.deleteCat(id);
-        document.location.reload();
+        $container.innerHTML = "";
+        showCat();
     }
     // Подробная информация о коте
-    if (event.target.classList.contains("fa-file-lines")||event.target.classList.contains("cat-card__btn_open")){
+    if (event.target.dataset.btn_action === "open"){
         $modalCatInfo.classList.remove("hidden");
         const id = event.target.closest("[data-card]").dataset.card;
         showCurrentCat (id);
@@ -85,7 +90,6 @@ const showCurrentCat = (id) =>{
         return res.json();
     })
     .then(data => {
-        console.log(data);
         $modalCatInfo.querySelector(".modal-cat-card__name").innerText = data.name;
         $modalCatInfo.querySelector(".modal-cat-card__img").src = data.image;
         $modalCatInfo.querySelector(".modal-cat-card__age").innerText = `Возраст: ${data.age} ${rightAge(data.age)}`;
@@ -96,8 +100,10 @@ const showCurrentCat = (id) =>{
         } else {
             $modalCatInfo.querySelector(".modal-cat-card__text").innerText = data.description;
         }
+        $modalCatInfo.dataset.id = `${data.id}`;
     })
 }
+
 // Написание год/года/лет
 function rightAge(age){
     if (age === 1) {
@@ -119,7 +125,7 @@ function showRate(rate){
         $ratingFront.firstChild.remove();
     }
     for(let i = 1; i<=5; i++){
-        const $star = document.createElement('i');
+        const $star = document.createElement("i");
         if (i<=ratingBD) {
             $star.classList.add("fa-solid", "fa-star");
             $ratingFront.appendChild($star);
@@ -133,24 +139,36 @@ function showRate(rate){
 // Отрисовка любимый/нелюбимый 
 function showFavorUnfavor(favorite) {
     const $favorite = $modalCatInfo.querySelector(".modal-cat-card__favorite");
-    const $heart = document.createElement("i");
-    $heart.classList.add("fa-sharp", "fa-heart");
-    while($favorite.firstChild){
-        $favorite.firstChild.remove();
-    }
     if (favorite) {
-        $heart.classList.add("fa-solid")
-        $favorite.appendChild($heart);
+        $favorite.innerHTML = `<i class="fa-sharp fa-solid fa-heart"></i>`;
     } else {
-        $heart.classList.add("fa-regular")
-        $favorite.appendChild($heart);
+        $favorite.innerHTML = `<i class="fa-sharp fa-regular fa-heart"></i>`;
     }
 }
 
-// Закрыть подробную информацию о коте
-$modalCatInfo.addEventListener("click", (event) =>{
-    if (event.target.classList.contains("fa-rectangle-xmark")){
+// EventListener на карточку кота
+$modalCatInfo.addEventListener("click",  async(event) =>{
+    // Закрыть карточку кота
+    if (event.target.dataset.btn_action === "modal-close" || event.target.classList.contains("modal-cat-info")){
         $modalCatInfo.classList.add("hidden")
+    }
+
+    // Открыть и заполнить изменение кота
+    if (event.target.dataset.btn_action === "modal-edit") {
+        const id = $modalCatInfo.dataset.id;
+        $modalCatInfo.classList.add("hidden")
+        $modalEditCat.classList.remove("hidden")
+        const editCurrentCat = await api.getCurrentCat(id);
+        data = await editCurrentCat.json();
+        $editForm = document.forms.editCat;
+        $editForm.name.value = data.name;
+        $editForm.image.value = data.image;
+        $editForm.age.value = data.age;
+        $editForm.rate.value = data.rate;
+        $editForm.description.value = data.description;
+        $editForm.favorite = "false";
+        $editForm.favorite.checked = data.favorite;
+        
     }
 })
 
@@ -160,12 +178,12 @@ $addBtn.addEventListener("click", (event) => {
 })
 
 $modalAddCat.addEventListener("click", (event) => {
-    if(event.target.classList.contains("fa-rectangle-xmark")){
-        $modalAddCat.classList.add("hidden")
+    if(event.target.dataset.btn_action === "modal-close"||event.target.classList.contains("modal-wrapper")){
+        $modalAddCat.classList.add("hidden");
     }
 })
 
-document.forms['add-cat'].addEventListener("submit", async (event) => {
+document.forms.addCat.addEventListener("submit", async (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.target).entries());
     data.id = Math.floor(Math.random()*10e7);
@@ -173,8 +191,46 @@ document.forms['add-cat'].addEventListener("submit", async (event) => {
     data.rate = Number(data.rate);
     data.favorite = !!data.favorite;
     await api.addNewCat(data);
-    $modalAddCat.classList.add("hidden")
-    document.location.reload();
+    $modalAddCat.classList.add("hidden");
+    $container.innerHTML = "";
+    showCat();
 })
+
+// Изменение кота
+$modalEditCat.addEventListener("click", (event) => {
+    if(event.target.dataset.btn_action === "modal-close"||event.target.classList.contains("modal-wrapper-edit")){
+        $modalEditCat.classList.add("hidden");
+    }
+})
+
+document.forms.editCat.addEventListener("submit", async (event) => {
+    event.preventDefault(); 
+    const data = Object.fromEntries(new FormData(event.target).entries());
+    data.favorite = !!data.favorite;
+    const id = $modalCatInfo.dataset.id;
+    await api.editCat(data, id);
+    $modalEditCat.classList.add("hidden");
+    showCurrentCat(id);
+    $modalCatInfo.classList.remove("hidden");
+    $container.innerHTML = "";
+    showCat();
+})
+
+// LocalStorage
+document.forms.addCat.addEventListener("input", event => {
+    const data = Object.fromEntries(new FormData(document.forms.addCat).entries());
+    localStorage.setItem("addCat", JSON.stringify(data));
+})
+
+const dataFromLS = localStorage.getItem("addCat");
+const parsedDataFromLS = dataFromLS ? JSON.parse(dataFromLS) : null;
+
+
+if (parsedDataFromLS) {
+    for (key in parsedDataFromLS) {
+        document.forms.addCat[key].value = parsedDataFromLS[key];
+    }
+}
+
 
 showCat();

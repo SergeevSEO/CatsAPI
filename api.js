@@ -27,6 +27,16 @@ class CatsApi {
         })
       }
 
+    editCat(data, id) {
+      return fetch(`${this.url}/update/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+    }
+
     editFavorite(id, boolean) {
         return fetch(`${this.url}/update/${id}`, {
             method: "PUT",

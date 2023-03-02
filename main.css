@@ -5,6 +5,10 @@ body {
     position: relative;
 }
 
+i {
+    pointer-events: none;
+}
+
 input, textarea {
     display: block;
 }
@@ -57,9 +61,10 @@ h1, h2 {
     border: 3px solid #bebebe;
     border-radius: 10px;
     padding: 7px;
-    background: #d5ffd8;
+
     font-size: 18px; 
 }
+
 .btn:hover, .cat-card__btn:hover {
     border-color: #5a5a5a;
 }
@@ -67,6 +72,20 @@ h1, h2 {
 .btn:active, .cat-card__btn:active {
     box-shadow: 0 0 5px rgb(0 0 0);
     border-color: #5a5a5a;
+}
+
+.btn-add-cat {
+    background: #d5ffd8;
+}
+
+.modal-cat-card__btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+.btn-edit{
+    background: #f5d36d;
 }
 
 .container {
@@ -141,7 +160,7 @@ h1, h2 {
  color: #4bcb90;
 }
 
-.modal-wrapper, .modal-cat-info {
+.modal-wrapper, .modal-cat-info, .modal-wrapper-edit {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -154,7 +173,7 @@ h1, h2 {
 }
 
 /* Модальное окно добавления кота */
-.modal-add-cat {
+.modal-add-cat, .modal-edit-cat {
     background: #f0f0f0;
     position: fixed;
     padding: 15px;
@@ -167,6 +186,11 @@ h1, h2 {
     padding: 5px;
 }
 
+.modal-edit-cat input, textarea {
+    margin-top: 2px;
+    padding: 5px;
+}
+
 .modal-close {
     font-size: 16px;
     color: #f4676a;
@@ -175,20 +199,29 @@ h1, h2 {
     right: 7px;
 }
 
-.modal-add-cat__numbers {
+.modal-add-cat__numbers, .modal-edit-cat__numbers {
     display: flex;
 }
 
-.modal-add-cat__numbers p:first-child {
+.modal-add-cat__numbers, p:first-child {
     margin-right: 30px;
 }
 
-.modal-add-cat__checkbox {
+.modal-edit-cat__numbers p:first-child {
+    margin-right: 30px;
+}
+
+.modal-add-cat__checkbox, .modal-edit-cat__checkbox {
     display: inline;
     font-size: 20px;
 }
 
 .modal-add-cat button {
+    display: block;
+    margin-left: auto;
+}
+
+.modal-edit-cat button {
     display: block;
     margin-left: auto;
 }
@@ -209,7 +242,7 @@ h1, h2 {
 }
 
 .modal-cat-card__param {
-    padding: 15px;
+    padding: 15px 15px 35px 15px;
     margin: auto 0;
 }
 
